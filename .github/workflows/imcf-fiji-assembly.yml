@@ -122,12 +122,14 @@ jobs:
           chmod -Rv +x fiji-linux-x64 || true
           chmod -Rv +x fiji || true
           chmod -Rv +x config/jaunch/jaunch-linux-x64 || true
-          # ls -la config/jaunch
-          cd -
+
+      - name: 🎁 Prepare artifacts for uploading
+        run: |
           echo PWD $(pwd)
+          ls
           echo "Preparing 'artifacts' dir for upload..."
           mkdir artifacts
-          mv -v "$FIJI_DIR_FULL" artifacts/
+          mv -v "${{ env.FIJI_DIR }}" artifacts/
           ls artifacts
 
       - name: 📤 Upload packaged 📦 Fiji artifact
