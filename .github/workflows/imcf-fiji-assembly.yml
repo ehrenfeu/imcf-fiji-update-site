@@ -65,6 +65,8 @@ jobs:
             echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
           fi
 
+          cat $GITHUB_ENV
+
       - name: 🐛 Debug variables
         shell: bash
         run: |
@@ -106,8 +108,12 @@ jobs:
               $PLATFORM \
               ${{ matrix.channel }}
 
-      - name: 🔧 Ensure downloaded Fiji launchers are executable
+      - name: 🔧 Prepare Fiji directory for zipping (name, executable flags, ...)
         run: |
+          echo "Renaming Fiji.app-${{ env.PLATFORM }} to ${{ env.FIJI_DIR }}"
+          ls
+          mv -v "Fiji.app-${{ env.PLATFORM }}" "${{ env.FIJI_DIR }}"
+          ls
           echo "Setting executable bits for Fiji artifacts"
           cd ${{ env.FIJI_DIR }}
           pwd
@@ -116,19 +122,19 @@ jobs:
           chmod -Rv +x fiji-linux-x64 || true
           chmod -Rv +x fiji || true
           chmod -Rv +x config/jaunch/jaunch-linux-x64 || true
-          ls -la config/jaunch
+          # ls -la config/jaunch
 
-      - name: 🧮📍 Set artifact label
-        run: |
-          echo "LABEL=${{ env.PLATFORM }}--${{ matrix.channel }}"
-            echo "PLATFORM=win64" >> $GITHUB_ENV
-            echo "FIJI_DIR=Fiji.app-win64" >> $GITHUB_ENV
-            echo "PLATFORM_NAME=windows" >> $GITHUB_ENV
-          else
-            echo "PLATFORM=linux64" >> $GITHUB_ENV
-            echo "FIJI_DIR=Fiji.app-linux" >> $GITHUB_ENV
-            echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
-          fi
+      # - name: 🧮📍 Set artifact label
+      #   run: |
+      #     echo "LABEL=${{ env.PLATFORM }}--${{ matrix.channel }}"
+      #       echo "PLATFORM=win64" >> $GITHUB_ENV
+      #       echo "FIJI_DIR=Fiji.app-win64" >> $GITHUB_ENV
+      #       echo "PLATFORM_NAME=windows" >> $GITHUB_ENV
+      #     else
+      #       echo "PLATFORM=linux64" >> $GITHUB_ENV
+      #       echo "FIJI_DIR=Fiji.app-linux" >> $GITHUB_ENV
+      #       echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
+      #     fi
 
       - name: 📤 Upload packaged 📦 Fiji artifact
         uses: actions/upload-artifact@v7
