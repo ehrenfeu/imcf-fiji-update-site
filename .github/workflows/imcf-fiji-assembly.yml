@@ -31,20 +31,20 @@ jobs:
           RELEASE_TAG=v${TIMESTAMP}
           RELEASE_NAME=${CURRENT_DATE} ${CURRENT_TIME_H}
           " >> $GITHUB_OUTPUT
-          echo $GITHUB_OUTPUT
+
           cat $GITHUB_OUTPUT
 
-  # assemble-fiji:
-  #   name: 🏗️ Assemble Fiji Packages 📦
-  #   strategy:
-  #     matrix:
-  #       # os: [ ubuntu-latest, windows-latest ]
-  #       # channel: [ fiji-latest, fiji-stable ]
-  #       os: [ ubuntu-latest ]
-  #       channel: [ fiji-latest ]
-  #   runs-on: ${{ matrix.os }}
+  assemble-fiji:
+    name: 🏗️ Assemble Fiji Packages 📦
+    strategy:
+      matrix:
+        # os: [ ubuntu-latest, windows-latest ]
+        # channel: [ fiji-latest, fiji-stable ]
+        os: [ ubuntu-latest ]
+        channel: [ fiji-latest ]
+    runs-on: ${{ matrix.os }}
 
-  #   steps:
+    steps:
 
   #     - name: 📥 Checkout repository
   #       uses: actions/checkout@v7
@@ -63,12 +63,19 @@ jobs:
   #           echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
   #         fi
 
-  #     - name: 🐛 Debug variables
-  #       shell: bash
-  #       run: |
-  #         echo "PLATFORM=$PLATFORM (${{ env.PLATFORM }})"
-  #         echo "FIJI_DIR=$FIJI_DIR (${{ env.FIJI_DIR }})"
-  #         echo "PLATFORM_NAME=$PLATFORM_NAME (${{ env.PLATFORM_NAME }})"
+      - name: 🐛 Debug variables
+        shell: bash
+        run: |
+          echo "PLATFORM=$PLATFORM (${{ env.PLATFORM }})"
+          echo "FIJI_DIR=$FIJI_DIR (${{ env.FIJI_DIR }})"
+          echo "PLATFORM_NAME=$PLATFORM_NAME (${{ env.PLATFORM_NAME }})"
+          echo "
+          $CURRENT_DATE
+          $CURRENT_TIME
+          $TIMESTAMP
+          $RELEASE_TAG
+          $RELEASE_NAME
+          "
 
   #     - name: 💾 Cache Fiji base package
   #       id: cache-fiji
