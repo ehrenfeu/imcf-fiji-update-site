@@ -52,7 +52,6 @@ jobs:
           cat $GITHUB_ENV
 
       - name: 🧮📍 Set job-specific variables
-        id: set_platform
         shell: bash
         run: |
           if [[ "${{ matrix.os }}" == windows-* ]]; then
@@ -142,21 +141,32 @@ jobs:
           retention-days: 2
 
 
-  # release:
-  #   name: 🚚🌐 Publish Fiji Packages 📦
-  #   needs: assemble-fiji
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: 📥 Checkout repository
-  #       uses: actions/checkout@v7
-  #       with:
-  #         fetch-depth: 0
+  release:
+    name: 🚚🌐 Publish Fiji Packages 📦
+    needs: assemble-fiji
+    runs-on: ubuntu-latest
+    steps:
 
-  #     - name: 📥 Download Fiji artifacts (both channels)
-  #       uses: actions/download-artifact@v8
-  #       with:
-  #         name: Fiji.app-fiji-latest-linux
-  #         path: ./artifacts/Fiji.app-fiji-latest-linux
+      - name: 🧮🌍 Make common variables available for job
+        run: |
+          echo "
+          TIMESTAMP=${{ needs.common-vars.outputs.TIMESTAMP }}
+          " >> $GITHUB_ENV
+          cat $GITHUB_ENV
+
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: 📥 Download Fiji artifacts (both channels)
+        uses: actions/download-artifact@v8
+        with:
+          name: Fiji.app-linux64-${{ env.TIMESTAMP }}-fiji-latest
+          path: artifacts/Fiji.app-linux64-${{ env.TIMESTAMP }}-fiji-latest
+
+      - run: |
+          ls artifacts
 
   #     - name: 📥 Download Fiji artifacts (fiji-stable linux)
   #       uses: actions/download-artifact@v8
