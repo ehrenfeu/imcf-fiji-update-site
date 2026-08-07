@@ -38,38 +38,38 @@ jobs:
           cat $GITHUB_OUTPUT
 
 
-  job2:
-    name: 🐛 Debug variables
-    needs: common-vars
-    runs-on: ubuntu-latest
-
-    steps:
-      - run: |
-          echo "RELEASE_NAME: ${{ needs.common-vars.outputs.RELEASE_NAME }}"
-
-      # - env:
-      #     CURRENT_DATE: ${{ needs.common-vars.outputs.CURRENT_DATE }}
-      #     CURRENT_TIME: ${{ needs.common-vars.outputs.CURRENT_TIME }}
-      #     TIMESTAMP: ${{ needs.common-vars.outputs.TIMESTAMP }}
-      #     RELEASE_TAG: ${{ needs.common-vars.outputs.RELEASE_TAG }}
-      #     RELEASE_NAME: ${{ needs.common-vars.outputs.RELEASE_NAME }}
-      #   run: echo "$CURRENT_DATE $CURRENT_TIME $RELEASE_NAME"
-
-
-
-
-  # assemble-fiji:
-  #   name: 🏗️ Assemble Fiji Packages 📦
+  # job2:
+  #   name: 🐛 Debug variables
   #   needs: common-vars
-  #   strategy:
-  #     matrix:
-  #       # os: [ ubuntu-latest, windows-latest ]
-  #       # channel: [ fiji-latest, fiji-stable ]
-  #       os: [ ubuntu-latest ]
-  #       channel: [ fiji-latest ]
-  #   runs-on: ${{ matrix.os }}
+  #   runs-on: ubuntu-latest
 
   #   steps:
+  #     - run: |
+  #         echo "RELEASE_NAME: ${{ needs.common-vars.outputs.RELEASE_NAME }}"
+
+  #     # - env:
+  #     #     CURRENT_DATE: ${{ needs.common-vars.outputs.CURRENT_DATE }}
+  #     #     CURRENT_TIME: ${{ needs.common-vars.outputs.CURRENT_TIME }}
+  #     #     TIMESTAMP: ${{ needs.common-vars.outputs.TIMESTAMP }}
+  #     #     RELEASE_TAG: ${{ needs.common-vars.outputs.RELEASE_TAG }}
+  #     #     RELEASE_NAME: ${{ needs.common-vars.outputs.RELEASE_NAME }}
+  #     #   run: echo "$CURRENT_DATE $CURRENT_TIME $RELEASE_NAME"
+
+
+
+
+  assemble-fiji:
+    name: 🏗️ Assemble Fiji Packages 📦
+    needs: common-vars
+    strategy:
+      matrix:
+        # os: [ ubuntu-latest, windows-latest ]
+        # channel: [ fiji-latest, fiji-stable ]
+        os: [ ubuntu-latest ]
+        channel: [ fiji-latest ]
+    runs-on: ${{ matrix.os }}
+
+    steps:
 
   #     - env:
   #         CURRENT_DATE: ${{ needs.common-vars.outputs.CURRENT_DATE }}
@@ -81,17 +81,16 @@ jobs:
   # #     - name: 📥 Checkout repository
   # #       uses: actions/checkout@v7
 
-  #     - name: 🧮🌍 Set common variables
-  #       shell: bash
-  #       run: |
-  #         echo "
-  #         CURRENT_DATE=${{ needs.common-vars.outputs.CURRENT_DATE }}
-  #         CURRENT_TIME=${{ needs.common-vars.outputs.CURRENT_TIME }}
-  #         TIMESTAMP=${{ needs.common-vars.outputs.TIMESTAMP }}
-  #         RELEASE_TAG=${{ needs.common-vars.outputs.RELEASE_TAG }}
-  #         RELEASE_NAME=${{ needs.common-vars.outputs.RELEASE_NAME }}
-  #         " >> $GITHUB_ENV
-  #         cat $GITHUB_ENV
+      - name: 🧮🌍 Set common variables
+        run: |
+          echo "
+          CURRENT_DATE=${{ needs.common-vars.outputs.CURRENT_DATE }}
+          CURRENT_TIME=${{ needs.common-vars.outputs.CURRENT_TIME }}
+          TIMESTAMP=${{ needs.common-vars.outputs.TIMESTAMP }}
+          RELEASE_TAG=${{ needs.common-vars.outputs.RELEASE_TAG }}
+          RELEASE_NAME=${{ needs.common-vars.outputs.RELEASE_NAME }}
+          " >> $GITHUB_ENV
+          cat $GITHUB_ENV
 
   #     - name: 🧮📍 Set job-specific variables
   #       id: set_platform
