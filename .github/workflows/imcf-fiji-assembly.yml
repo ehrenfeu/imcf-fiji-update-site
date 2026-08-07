@@ -73,7 +73,8 @@ jobs:
       - name: 🔧 Ensure downloaded Fiji launchers are executable
         run: |
           ls -la
-          echo ${{ env.FIJI_DIR }}
+          cd ${{ env.FIJI_DIR }}
+          ls -la
 
           echo "Setting executable bits for Fiji artifacts"
           chmod -Rv +x ${{ env.FIJI_DIR }}/Fiji.app-* || true
