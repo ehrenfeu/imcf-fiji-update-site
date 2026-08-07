@@ -77,17 +77,15 @@ jobs:
 
       - name: 🔧 Ensure downloaded Fiji launchers are executable
         run: |
-          pwd
-          ls -la
-          cd ${{ env.FIJI_DIR }}
-          ls -la
-
           echo "Setting executable bits for Fiji artifacts"
+          cd ${{ env.FIJI_DIR }}
+          pwd
           chmod -Rv +x Fiji.app-* || true
           # Ensure jaunch helper and primary launchers are executable where present
           chmod -Rv +x fiji-linux-x64 || true
           chmod -Rv +x fiji || true
           chmod -Rv +x config/jaunch/jaunch-linux-x64 || true
+          ls -la config/jaunch
 
   #     - name: 📤 Upload packaged 📦 Fiji artifact
   #       uses: actions/upload-artifact@v7
