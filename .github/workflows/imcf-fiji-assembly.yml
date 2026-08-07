@@ -20,9 +20,11 @@ jobs:
         os: [ ubuntu-latest ]
         channel: [ fiji-latest ]
     runs-on: ${{ matrix.os }}
+
     steps:
-      # - name: 📥 Checkout repository
-      #   uses: actions/checkout@v7
+
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v7
 
       - name: 🖥️ Set platform variables
         id: set_platform
@@ -45,28 +47,37 @@ jobs:
           echo "FIJI_DIR=$FIJI_DIR (${{ env.FIJI_DIR }})"
           echo "PLATFORM_NAME=$PLATFORM_NAME (${{ env.PLATFORM_NAME }})"
 
-  #     - name: 💾 Cache Fiji base package
-  #       id: cache-fiji
-  #       uses: actions/cache@v6
-  #       with:
-  #         path: fiji-*.zip
-  #         key:
-  #           fiji-base-${{ matrix.channel }}-${{ env.PLATFORM }}-${{ hashFiles('manage/assemble-fresh-fiji-installation.sh') }}
+      - name: 💾 Cache Fiji base package
+        id: cache-fiji
+        uses: actions/cache@v6
+        with:
+          path: fiji-*.zip
+          key:
+            fiji-base-${{ matrix.channel }}-${{ env.PLATFORM }}-${{ hashFiles('manage/assemble-fresh-fiji-installation.sh') }}
 
-  #     - name: 🛠️ Install X11 libraries (Linux only)
-  #       if: matrix.os == 'ubuntu-latest'
-  #       run: |
-  #         sudo apt-get update
-  #         # Install xvfb and the X11 libs ImageJ/Fiji needs
-  #         sudo apt-get install -y xvfb libx11-6 libxext6 libxrender1 libxtst6 libxi6
+      - name: 🛠️ Install X11 libraries (Linux only)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          # Install xvfb and the X11 libs ImageJ/Fiji needs
+          sudo apt-get install -y xvfb libx11-6 libxext6 libxrender1 libxtst6 libxi6
 
-  #     - name: 🏃‍♂️ Run the assembly script
-  #       shell: bash
-  #       run: |
-  #         bash manage/assemble-fresh-fiji-installation.sh \
-  #             manage/update-sites-all.json \
-  #             $PLATFORM \
-  #             ${{ matrix.channel }}
+      - name: 🏃‍♂️ Run the assembly script
+        shell: bash
+        run: |
+          bash manage/assemble-fresh-fiji-installation.sh \
+              manage/update-sites-all.json \
+              $PLATFORM \
+              ${{ matrix.channel }}
+
+      - name: 🔧 Ensure downloaded Fiji launchers are executable
+        run: |
+          echo "Setting executable bits for Fiji artifacts"
+          chmod -Rv +x ${{ env.FIJI_DIR }}/Fiji.app-* || true
+          # Ensure jaunch helper and primary launchers are executable where present
+          chmod -Rv +x ${{ env.FIJI_DIR }}/*/fiji-linux-x64 || true
+          chmod -Rv +x ${{ env.FIJI_DIR }}/*/fiji || true
+          chmod -Rv +x ${{ env.FIJI_DIR }}/*/config/jaunch/jaunch-linux-x64 || true
 
   #     - name: 📤 Upload packaged 📦 Fiji artifact
   #       uses: actions/upload-artifact@v7
@@ -108,15 +119,6 @@ jobs:
   #       with:
   #         name: Fiji.app-fiji-stable-windows
   #         path: ./artifacts/Fiji.app-fiji-stable-windows
-
-  #     - name: 🔧 Ensure downloaded Fiji launchers are executable
-  #       run: |
-  #         echo "Setting executable bits for Fiji artifacts"
-  #         chmod -R +x ./artifacts/Fiji.app-* || true
-  #         # Ensure jaunch helper and primary launchers are executable where present
-  #         chmod -R +x ./artifacts/*/fiji-linux-x64 || true
-  #         chmod -R +x ./artifacts/*/fiji || true
-  #         chmod -R +x ./artifacts/*/config/jaunch/jaunch-linux-x64 || true
 
   #     - name: 📦 Create zip files and set release tag 🔖
   #       id: prepare_release
