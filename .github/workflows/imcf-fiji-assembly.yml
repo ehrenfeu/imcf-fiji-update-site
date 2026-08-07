@@ -26,7 +26,7 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v7
 
-      - name: 🖥️ Set platform variables
+      - name: 🧮 Set variables
         id: set_platform
         shell: bash
         run: |
@@ -87,11 +87,13 @@ jobs:
           chmod -Rv +x config/jaunch/jaunch-linux-x64 || true
           ls -la config/jaunch
 
-  #     - name: 📤 Upload packaged 📦 Fiji artifact
-  #       uses: actions/upload-artifact@v7
-  #       with:
-  #         name: Fiji.app-${{ matrix.channel }}-${{ env.PLATFORM_NAME }}
-  #         path: ${{ env.FIJI_DIR }}
+      - name: 📤 Upload packaged 📦 Fiji artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Fiji.app--${{ env.PLATFORM }}
+          path: ${{ env.FIJI_DIR }}
+          compression-level: 1
+          retention-days: 2
 
 
   # release:
