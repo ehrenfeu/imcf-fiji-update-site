@@ -9,15 +9,15 @@ on:
         description: "Reason for manual run"
         required: false
         default: "Manual trigger"
-      channel:
-        description: 'Fiji Channel'
+      channels:
+        description: 'Fiji Channels'
         required: true
-        default: [ fiji-latest, fiji-stable ]
+        default:  '["fiji-latest", "fiji-stable"]'
         type: choice
         options:
-          - [ fiji-latest, fiji-stable ]
-          - [ fiji-latest ]
-          - [ fiji-stable ]
+          - '["fiji-latest", "fiji-stable"]'
+          - '["fiji-stable"]'
+          - '["fiji-latest"]'
 
 jobs:
 
@@ -47,7 +47,7 @@ jobs:
       matrix:
         # os: [ ubuntu-latest, windows-latest ]
         # channel: [ fiji-latest, fiji-stable ]
-        channel: ${{ inputs.channel }}
+        channel: ${{ fromJSON(github.event.inputs.channels)}}
         os: [ ubuntu-latest ]
         # channel: [ fiji-latest ]
     runs-on: ${{ matrix.os }}
