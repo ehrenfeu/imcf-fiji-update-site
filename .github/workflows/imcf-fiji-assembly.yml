@@ -47,6 +47,13 @@ jobs:
 
     steps:
 
+      - env:
+          CURRENT_DATE: ${{ needs.common-vars.outputs.CURRENT_DATE }}
+          CURRENT_TIME: ${{ needs.common-vars.outputs.CURRENT_TIME }}
+          TIMESTAMP: ${{ needs.common-vars.outputs.TIMESTAMP }}
+          RELEASE_TAG: ${{ needs.common-vars.outputs.RELEASE_TAG }}
+          RELEASE_NAME: ${{ needs.common-vars.outputs.RELEASE_NAME }}
+        run: echo "$CURRENT_DATE $CURRENT_TIME $RELEASE_NAME"
   #     - name: 📥 Checkout repository
   #       uses: actions/checkout@v7
 
