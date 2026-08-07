@@ -16,6 +16,10 @@ jobs:
     name: 👷🏼 Prepare workflow run
     runs-on: ubuntu-latest
     outputs:
+      CURRENT_DATE: ${{ steps.common_vars.outputs.CURRENT_DATE }}
+      CURRENT_TIME: ${{ steps.common_vars.outputs.CURRENT_TIME }}
+      TIMESTAMP: ${{ steps.common_vars.outputs.TIMESTAMP }}
+      RELEASE_TAG: ${{ steps.common_vars.outputs.RELEASE_TAG }}
       RELEASE_NAME: ${{ steps.common_vars.outputs.RELEASE_NAME }}
     steps:
 
