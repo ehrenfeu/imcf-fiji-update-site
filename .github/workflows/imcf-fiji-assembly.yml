@@ -116,14 +116,15 @@ jobs:
           ls
           echo "Setting executable bits for Fiji artifacts"
           cd ${{ env.FIJI_DIR }}
-          echo "pwd: $(pwd)"
+          echo PWD $(pwd)
           chmod -Rv +x Fiji.app-* || true
           # Ensure jaunch helper and primary launchers are executable where present
           chmod -Rv +x fiji-linux-x64 || true
           chmod -Rv +x fiji || true
           chmod -Rv +x config/jaunch/jaunch-linux-x64 || true
           # ls -la config/jaunch
-          cd
+          cd -
+          echo PWD $(pwd)
           echo "Preparing 'artifacts' dir for upload..."
           mkdir artifacts
           mv -v "$FIJI_DIR_FULL" artifacts/
