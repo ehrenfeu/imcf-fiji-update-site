@@ -244,19 +244,19 @@ echo
 #     echo "Warning: failed to download Mexican_Hat_Filter.class"
 # fi
 
-echo ">>> adding required update sites..."
-# Ensure we log command output
-set -x
-# enable headless Java and detect Xvfb for non-GUI execution environments
-export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true ${JAVA_TOOL_OPTIONS:-}"
+# echo ">>> adding required update sites..."
+# # Ensure we log command output
+# set -x
+# # enable headless Java and detect Xvfb for non-GUI execution environments
+# export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true ${JAVA_TOOL_OPTIONS:-}"
 
-$FIJI_CMD \
-    --headless --run manage/add-update-sites.py \
-    "sites_collection='$UPD_SITES'"
-set +x
-echo
-echo ">>> running updater..."
-$FIJI_CMD --headless --update update
+# $FIJI_CMD \
+#     --headless --run manage/add-update-sites.py \
+#     "sites_collection='$UPD_SITES'"
+# set +x
+# echo
+# echo ">>> running updater..."
+# $FIJI_CMD --headless --update update
 
 echo
 echo "DONE! Took $SECONDS seconds."
