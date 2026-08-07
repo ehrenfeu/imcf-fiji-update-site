@@ -9,6 +9,15 @@ on:
         description: "Reason for manual run"
         required: false
         default: "Manual trigger"
+      loglevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
 
 jobs:
 
