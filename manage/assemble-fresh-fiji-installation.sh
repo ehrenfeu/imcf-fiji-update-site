@@ -182,85 +182,85 @@ echo "Using Fiji command: $FIJI_CMD"
 echo
 echo
 
-# # Try to fetch the latest OMERO_ij jar from GitHub releases (pure Bash)
-# OMERO_OWNER="ome"
-# OMERO_REPO="omero-insight"
-# MATCH_RE='^omero_ij-.*\.jar$'
+# Try to fetch the latest OMERO_ij jar from GitHub releases (pure Bash)
+OMERO_OWNER="ome"
+OMERO_REPO="omero-insight"
+MATCH_RE='^omero_ij-.*\.jar$'
 
-# if command -v curl >/dev/null 2>&1; then
-#     echo "Looking up latest OMERO_ij release for ${OMERO_OWNER}/${OMERO_REPO}..."
+if command -v curl >/dev/null 2>&1; then
+    echo "Looking up latest OMERO_ij release for ${OMERO_OWNER}/${OMERO_REPO}..."
 
-#     find_asset_url() {
-#         # $1: raw JSON
-#         local json="$1"
-#         local line name url
-#         # extract only name and browser_download_url tokens in order
-#         echo "$json" | grep -oE '"name"\s*:\s*"[^"]+"|"browser_download_url"\s*:\s*"[^"]+"' | \
-#         while read -r line; do
-#             if [[ $line =~ \"name\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
-#                 name="${BASH_REMATCH[1]}"
-#                 # normalize to lowercase for case-insensitive matching
-#                 name_lc=$(printf '%s' "$name" | tr '[:upper:]' '[:lower:]')
-#             elif [[ $line =~ \"browser_download_url\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
-#                 url="${BASH_REMATCH[1]}"
-#                 if [[ $name_lc =~ $MATCH_RE ]]; then
-#                     printf '%s' "$url"
-#                     return 0
-#                 fi
-#             fi
-#         done
-#         return 1
-#     }
+    find_asset_url() {
+        # $1: raw JSON
+        local json="$1"
+        local line name url
+        # extract only name and browser_download_url tokens in order
+        echo "$json" | grep -oE '"name"\s*:\s*"[^"]+"|"browser_download_url"\s*:\s*"[^"]+"' | \
+        while read -r line; do
+            if [[ $line =~ \"name\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
+                name="${BASH_REMATCH[1]}"
+                # normalize to lowercase for case-insensitive matching
+                name_lc=$(printf '%s' "$name" | tr '[:upper:]' '[:lower:]')
+            elif [[ $line =~ \"browser_download_url\"[[:space:]]*:[[:space:]]*\"([^\"]+)\" ]]; then
+                url="${BASH_REMATCH[1]}"
+                if [[ $name_lc =~ $MATCH_RE ]]; then
+                    printf '%s' "$url"
+                    return 0
+                fi
+            fi
+        done
+        return 1
+    }
 
-#     asset_url=""
-#     json=$(curl -s "https://api.github.com/repos/${OMERO_OWNER}/${OMERO_REPO}/releases/latest")
-#     asset_url=$(find_asset_url "$json" || true)
+    asset_url=""
+    json=$(curl -s "https://api.github.com/repos/${OMERO_OWNER}/${OMERO_REPO}/releases/latest")
+    asset_url=$(find_asset_url "$json" || true)
 
-#     if [ -z "$asset_url" ]; then
-#         # fallback: scan recent releases
-#         json=$(curl -s "https://api.github.com/repos/${OMERO_OWNER}/${OMERO_REPO}/releases")
-#         asset_url=$(find_asset_url "$json" || true)
-#     fi
+    if [ -z "$asset_url" ]; then
+        # fallback: scan recent releases
+        json=$(curl -s "https://api.github.com/repos/${OMERO_OWNER}/${OMERO_REPO}/releases")
+        asset_url=$(find_asset_url "$json" || true)
+    fi
 
-#     if [ -n "$asset_url" ]; then
-#         echo "Found OMERO asset: $asset_url"
-#         asset_name=$(basename "$asset_url")
-#         target_dir="$FIJI_DIR/plugins"
-#         mkdir -p "$target_dir"
-#         echo "Downloading $asset_name to $target_dir/"
-#         if curl -L --fail -sS "$asset_url" -o "$target_dir/$asset_name"; then
-#             chmod 644 "$target_dir/$asset_name" || true
-#         else
-#             echo "Warning: failed to download $asset_url"
-#         fi
-#     else
-#         echo "No OMERO_ij jar found in releases."
-#     fi
-# else
-#     echo "Skipping OMERO_ij download: 'curl' not available."
-# fi
+    if [ -n "$asset_url" ]; then
+        echo "Found OMERO asset: $asset_url"
+        asset_name=$(basename "$asset_url")
+        target_dir="$FIJI_DIR/plugins"
+        mkdir -p "$target_dir"
+        echo "Downloading $asset_name to $target_dir/"
+        if curl -L --fail -sS "$asset_url" -o "$target_dir/$asset_name"; then
+            chmod 644 "$target_dir/$asset_name" || true
+        else
+            echo "Warning: failed to download $asset_url"
+        fi
+    else
+        echo "No OMERO_ij jar found in releases."
+    fi
+else
+    echo "Skipping OMERO_ij download: 'curl' not available."
+fi
 
-# echo ">> Downloading Mexican_Hat_Filter.class to $FIJI_DIR/plugins/"
-# MEXICAN_HAT_URL="https://imagej.net/ij/plugins/mexican-hat/Mexican_Hat_Filter.class"
-# if curl -L --fail -sS "$MEXICAN_HAT_URL" -o "$FIJI_DIR/plugins/Mexican_Hat_Filter.class"; then
-#     chmod 644 "$FIJI_DIR/plugins/Mexican_Hat_Filter.class" || true
-# else
-#     echo "Warning: failed to download Mexican_Hat_Filter.class"
-# fi
+echo ">> Downloading Mexican_Hat_Filter.class to $FIJI_DIR/plugins/"
+MEXICAN_HAT_URL="https://imagej.net/ij/plugins/mexican-hat/Mexican_Hat_Filter.class"
+if curl -L --fail -sS "$MEXICAN_HAT_URL" -o "$FIJI_DIR/plugins/Mexican_Hat_Filter.class"; then
+    chmod 644 "$FIJI_DIR/plugins/Mexican_Hat_Filter.class" || true
+else
+    echo "Warning: failed to download Mexican_Hat_Filter.class"
+fi
 
-# echo ">>> adding required update sites..."
-# # Ensure we log command output
-# set -x
-# # enable headless Java and detect Xvfb for non-GUI execution environments
-# export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true ${JAVA_TOOL_OPTIONS:-}"
+echo ">>> adding required update sites..."
+# Ensure we log command output
+set -x
+# enable headless Java and detect Xvfb for non-GUI execution environments
+export JAVA_TOOL_OPTIONS="-Djava.awt.headless=true ${JAVA_TOOL_OPTIONS:-}"
 
-# $FIJI_CMD \
-#     --headless --run manage/add-update-sites.py \
-#     "sites_collection='$UPD_SITES'"
-# set +x
-# echo
-# echo ">>> running updater..."
-# $FIJI_CMD --headless --update update
+$FIJI_CMD \
+    --headless --run manage/add-update-sites.py \
+    "sites_collection='$UPD_SITES'"
+set +x
+echo
+echo ">>> running updater..."
+$FIJI_CMD --headless --update update
 
 echo
 echo "Assembling new Fiji in [$FIJI_DIR] took $SECONDS seconds. Done."
