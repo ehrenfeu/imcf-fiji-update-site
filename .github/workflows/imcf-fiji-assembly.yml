@@ -37,6 +37,27 @@ jobs:
 
           cat $GITHUB_OUTPUT
 
+
+  job2:
+    name: 🐛 Debug variables
+    needs: common-vars
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: |
+          echo "RELEASE_NAME: ${{ needs.common-vars.outputs.RELEASE_NAME }}"
+
+      # - env:
+      #     CURRENT_DATE: ${{ needs.common-vars.outputs.CURRENT_DATE }}
+      #     CURRENT_TIME: ${{ needs.common-vars.outputs.CURRENT_TIME }}
+      #     TIMESTAMP: ${{ needs.common-vars.outputs.TIMESTAMP }}
+      #     RELEASE_TAG: ${{ needs.common-vars.outputs.RELEASE_TAG }}
+      #     RELEASE_NAME: ${{ needs.common-vars.outputs.RELEASE_NAME }}
+      #   run: echo "$CURRENT_DATE $CURRENT_TIME $RELEASE_NAME"
+
+
+
+
   # assemble-fiji:
   #   name: 🏗️ Assemble Fiji Packages 📦
   #   needs: common-vars
