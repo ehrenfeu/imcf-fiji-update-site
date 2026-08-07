@@ -16,15 +16,15 @@ jobs:
     name: 👷🏼 Prepare workflow run
     runs-on: ubuntu-latest
     outputs:
-      CURRENT_DATE: ${{ steps.common-vars.outputs.CURRENT_DATE }}
-      CURRENT_TIME: ${{ steps.common-vars.outputs.CURRENT_TIME }}
-      TIMESTAMP: ${{ steps.common-vars.outputs.TIMESTAMP }}
-      RELEASE_TAG: ${{ steps.common-vars.outputs.RELEASE_TAG }}
-      RELEASE_NAME: ${{ steps.common-vars.outputs.RELEASE_NAME }}
+      CURRENT_DATE: ${{ steps.set-vars.outputs.CURRENT_DATE }}
+      CURRENT_TIME: ${{ steps.set-vars.outputs.CURRENT_TIME }}
+      TIMESTAMP: ${{ steps.set-vars.outputs.TIMESTAMP }}
+      RELEASE_TAG: ${{ steps.set-vars.outputs.RELEASE_TAG }}
+      RELEASE_NAME: ${{ steps.set-vars.outputs.RELEASE_NAME }}
     steps:
 
       - name: 🧮 Set variables common for all jobs
-        id: common-vars
+        id: set-vars
         shell: bash
         run: |
           CURRENT_DATE=$(date +%Y-%m-%d)
@@ -42,26 +42,6 @@ jobs:
           cat $GITHUB_OUTPUT
 
 
-  # job2:
-  #   name: 🐛 Debug variables
-  #   needs: common-vars
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - run: |
-  #         echo "RELEASE_NAME: ${{ needs.common-vars.outputs.RELEASE_NAME }}"
-
-  #     # - env:
-  #     #     CURRENT_DATE: ${{ needs.common-vars.outputs.CURRENT_DATE }}
-  #     #     CURRENT_TIME: ${{ needs.common-vars.outputs.CURRENT_TIME }}
-  #     #     TIMESTAMP: ${{ needs.common-vars.outputs.TIMESTAMP }}
-  #     #     RELEASE_TAG: ${{ needs.common-vars.outputs.RELEASE_TAG }}
-  #     #     RELEASE_NAME: ${{ needs.common-vars.outputs.RELEASE_NAME }}
-  #     #   run: echo "$CURRENT_DATE $CURRENT_TIME $RELEASE_NAME"
-
-
-
-
   assemble-fiji:
     name: 🏗️ Assemble Fiji Packages 📦
     needs: common-vars
@@ -75,17 +55,7 @@ jobs:
 
     steps:
 
-  #     - env:
-  #         CURRENT_DATE: ${{ needs.common-vars.outputs.CURRENT_DATE }}
-  #         CURRENT_TIME: ${{ needs.common-vars.outputs.CURRENT_TIME }}
-  #         TIMESTAMP: ${{ needs.common-vars.outputs.TIMESTAMP }}
-  #         RELEASE_TAG: ${{ needs.common-vars.outputs.RELEASE_TAG }}
-  #         RELEASE_NAME: ${{ needs.common-vars.outputs.RELEASE_NAME }}
-  #       run: echo "$CURRENT_DATE $CURRENT_TIME $RELEASE_NAME"
-  # #     - name: 📥 Checkout repository
-  # #       uses: actions/checkout@v7
-
-      - name: 🧮🌍 Set common variables
+      - name: 🧮🌍 Make common variables available for job
         run: |
           echo "
           CURRENT_DATE=${{ needs.common-vars.outputs.CURRENT_DATE }}
@@ -96,33 +66,33 @@ jobs:
           " >> $GITHUB_ENV
           cat $GITHUB_ENV
 
-  #     - name: 🧮📍 Set job-specific variables
-  #       id: set_platform
-  #       shell: bash
-  #       run: |
-  #         if [[ "${{ matrix.os }}" == windows-* ]]; then
-  #           echo "PLATFORM=win64" >> $GITHUB_ENV
-  #           echo "FIJI_DIR=Fiji.app-win64" >> $GITHUB_ENV
-  #           echo "PLATFORM_NAME=windows" >> $GITHUB_ENV
-  #         else
-  #           echo "PLATFORM=linux64" >> $GITHUB_ENV
-  #           echo "FIJI_DIR=Fiji.app-linux" >> $GITHUB_ENV
-  #           echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
-  #         fi
+      - name: 🧮📍 Set job-specific variables
+        id: set_platform
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == windows-* ]]; then
+            echo "PLATFORM=win64" >> $GITHUB_ENV
+            echo "FIJI_DIR=Fiji.app-win64" >> $GITHUB_ENV
+            echo "PLATFORM_NAME=windows" >> $GITHUB_ENV
+          else
+            echo "PLATFORM=linux64" >> $GITHUB_ENV
+            echo "FIJI_DIR=Fiji.app-linux" >> $GITHUB_ENV
+            echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
+          fi
 
-  #     - name: 🐛 Debug variables
-  #       shell: bash
-  #       run: |
-  #         echo "PLATFORM=$PLATFORM (${{ env.PLATFORM }})"
-  #         echo "FIJI_DIR=$FIJI_DIR (${{ env.FIJI_DIR }})"
-  #         echo "PLATFORM_NAME=$PLATFORM_NAME (${{ env.PLATFORM_NAME }})"
-  #         echo "
-  #         $CURRENT_DATE
-  #         $CURRENT_TIME
-  #         $TIMESTAMP
-  #         $RELEASE_TAG
-  #         $RELEASE_NAME
-  #         "
+      - name: 🐛 Debug variables
+        shell: bash
+        run: |
+          echo "
+          $PLATFORM (${{ env.PLATFORM }})
+          $FIJI_DIR (${{ env.FIJI_DIR }})
+          $PLATFORM_NAME (${{ env.PLATFORM_NAME }})
+          $CURRENT_DATE (${{ env.CURRENT_DATE }})
+          $CURRENT_TIME (${{ env.CURRENT_TIME }})
+          $TIMESTAMP (${{ env.TIMESTAMP }})
+          $RELEASE_TAG (${{ env.RELEASE_TAG }})
+          $RELEASE_NAME (${{ env.RELEASE_NAME }})
+          "
 
   #     - name: 💾 Cache Fiji base package
   #       id: cache-fiji
@@ -143,6 +113,10 @@ jobs:
   #           libxtst6
   #           libxi6
   #         version: 1.0
+
+  #     - name: 📥 Checkout repository
+  #       uses: actions/checkout@v7
+
 
   #     - name: 🏃‍♂️ Run the assembly script
   #       shell: bash
