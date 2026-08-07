@@ -19,134 +19,128 @@ jobs:
         channel: [ fiji-latest, fiji-stable ]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v7
+      # - name: 📥 Checkout repository
+      #   uses: actions/checkout@v7
 
       - name: 🖥️ Set platform variable
         id: set_platform
         shell: bash
         run: |
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+          if [[ "${{ matrix.os }}" == windows-* ]]; then
             echo "PLATFORM=win64" >> $GITHUB_ENV
-            echo "FIJI_DIR=Fiji.app-windows" >> $GITHUB_ENV
+            echo "FIJI_DIR=Fiji.app-win64" >> $GITHUB_ENV
             echo "PLATFORM_NAME=windows" >> $GITHUB_ENV
-            echo "PLATFORM=win64" >> $GITHUB_OUTPUT
-            echo "FIJI_DIR=Fiji.app-windows" >> $GITHUB_OUTPUT
-            echo "PLATFORM_NAME=windows" >> $GITHUB_OUTPUT
           else
             echo "PLATFORM=linux64" >> $GITHUB_ENV
             echo "FIJI_DIR=Fiji.app-linux" >> $GITHUB_ENV
             echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
-            echo "PLATFORM=linux64" >> $GITHUB_OUTPUT
-            echo "FIJI_DIR=Fiji.app-linux" >> $GITHUB_OUTPUT
-            echo "PLATFORM_NAME=linux" >> $GITHUB_OUTPUT
           fi
-          echo "Platform set to $PLATFORM"
+          echo "PLATFORM=$PLATFORM"
+          echo "FIJI_DIR=$FIJI_DIR"
 
-      - name: 💾 Cache Fiji base package
-        id: cache-fiji
-        uses: actions/cache@v6
-        with:
-          path: fiji-*.zip
-          key:
-            fiji-base-${{ matrix.channel }}-${{ steps.set_platform.outputs.PLATFORM
-            }}-${{ hashFiles('manage/assemble-fresh-fiji-installation.sh') }}
+  #     - name: 💾 Cache Fiji base package
+  #       id: cache-fiji
+  #       uses: actions/cache@v6
+  #       with:
+  #         path: fiji-*.zip
+  #         key:
+  #           fiji-base-${{ matrix.channel }}-${{ env.PLATFORM }}-${{ hashFiles('manage/assemble-fresh-fiji-installation.sh') }}
 
-      - name: 🛠️ Install X11 libraries (Linux only)
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          # Install xvfb and the X11 libs ImageJ/Fiji needs
-          sudo apt-get install -y xvfb libx11-6 libxext6 libxrender1 libxtst6 libxi6
+  #     - name: 🛠️ Install X11 libraries (Linux only)
+  #       if: matrix.os == 'ubuntu-latest'
+  #       run: |
+  #         sudo apt-get update
+  #         # Install xvfb and the X11 libs ImageJ/Fiji needs
+  #         sudo apt-get install -y xvfb libx11-6 libxext6 libxrender1 libxtst6 libxi6
 
-      - name: 🏃‍♂️ Run the assembly script
-        shell: bash
-        run: |
-          bash manage/assemble-fresh-fiji-installation.sh \
-              manage/update-sites-all.json \
-              $PLATFORM \
-              ${{ matrix.channel }}
+  #     - name: 🏃‍♂️ Run the assembly script
+  #       shell: bash
+  #       run: |
+  #         bash manage/assemble-fresh-fiji-installation.sh \
+  #             manage/update-sites-all.json \
+  #             $PLATFORM \
+  #             ${{ matrix.channel }}
 
-      - name: 📤 Upload packaged 📦 Fiji artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: Fiji.app-${{ matrix.channel }}-${{
-            steps.set_platform.outputs.PLATFORM_NAME }}
-          path: ${{ steps.set_platform.outputs.FIJI_DIR }}
+  #     - name: 📤 Upload packaged 📦 Fiji artifact
+  #       uses: actions/upload-artifact@v7
+  #       with:
+  #         name: Fiji.app-${{ matrix.channel }}-${{ env.PLATFORM_NAME }}
+  #         path: ${{ env.FIJI_DIR }}
 
-  release:
-    name: 🚚🌐 Publish Fiji Packages 📦
-    needs: assemble-fiji
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
-      - name: 📥 Download Fiji artifacts (both channels)
-        uses: actions/download-artifact@v8
-        with:
-          name: Fiji.app-fiji-latest-linux
-          path: ./artifacts/Fiji.app-fiji-latest-linux
+  # release:
+  #   name: 🚚🌐 Publish Fiji Packages 📦
+  #   needs: assemble-fiji
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: 📥 Checkout repository
+  #       uses: actions/checkout@v7
+  #       with:
+  #         fetch-depth: 0
 
-      - name: 📥 Download Fiji artifacts (fiji-stable linux)
-        uses: actions/download-artifact@v8
-        with:
-          name: Fiji.app-fiji-stable-linux
-          path: ./artifacts/Fiji.app-fiji-stable-linux
+  #     - name: 📥 Download Fiji artifacts (both channels)
+  #       uses: actions/download-artifact@v8
+  #       with:
+  #         name: Fiji.app-fiji-latest-linux
+  #         path: ./artifacts/Fiji.app-fiji-latest-linux
 
-      - name: 📥 Download Fiji artifacts (fiji-latest windows)
-        uses: actions/download-artifact@v8
-        with:
-          name: Fiji.app-fiji-latest-windows
-          path: ./artifacts/Fiji.app-fiji-latest-windows
+  #     - name: 📥 Download Fiji artifacts (fiji-stable linux)
+  #       uses: actions/download-artifact@v8
+  #       with:
+  #         name: Fiji.app-fiji-stable-linux
+  #         path: ./artifacts/Fiji.app-fiji-stable-linux
 
-      - name: 📥 Download Fiji artifacts (fiji-stable windows)
-        uses: actions/download-artifact@v8
-        with:
-          name: Fiji.app-fiji-stable-windows
-          path: ./artifacts/Fiji.app-fiji-stable-windows
+  #     - name: 📥 Download Fiji artifacts (fiji-latest windows)
+  #       uses: actions/download-artifact@v8
+  #       with:
+  #         name: Fiji.app-fiji-latest-windows
+  #         path: ./artifacts/Fiji.app-fiji-latest-windows
 
-      - name: 🔧 Ensure downloaded Fiji launchers are executable
-        run: |
-          echo "Setting executable bits for Fiji artifacts"
-          chmod -R +x ./artifacts/Fiji.app-* || true
-          # Ensure jaunch helper and primary launchers are executable where present
-          chmod -R +x ./artifacts/*/fiji-linux-x64 || true
-          chmod -R +x ./artifacts/*/fiji || true
-          chmod -R +x ./artifacts/*/config/jaunch/jaunch-linux-x64 || true
+  #     - name: 📥 Download Fiji artifacts (fiji-stable windows)
+  #       uses: actions/download-artifact@v8
+  #       with:
+  #         name: Fiji.app-fiji-stable-windows
+  #         path: ./artifacts/Fiji.app-fiji-stable-windows
 
-      - name: 📦 Create zip files and set release tag 🔖
-        id: prepare_release
-        run: |
-          # Use a timestamp (date + time) so multiple releases on the same
-          # day get unique tags and artifact names.
-          CURRENT_DATE=$(date +%Y-%m-%d)
-          CURRENT_TIME=$(date +%H-%M)
-          TIMESTAMP="${CURRENT_DATE}-${CURRENT_TIME}"
-          echo "RELEASE_TAG=v${TIMESTAMP}" >> $GITHUB_OUTPUT
-          echo "RELEASE_NAME=Fiji-IMCF ${CURRENT_DATE} ${CURRENT_TIME}" >> $GITHUB_OUTPUT
-          cd artifacts
-          for d in Fiji.app-*; do
-            if [ -d "$d" ]; then
-              zip -1 -r "${d}-${TIMESTAMP}.zip" "$d"
-            fi
-          done
-          cd ..
+  #     - name: 🔧 Ensure downloaded Fiji launchers are executable
+  #       run: |
+  #         echo "Setting executable bits for Fiji artifacts"
+  #         chmod -R +x ./artifacts/Fiji.app-* || true
+  #         # Ensure jaunch helper and primary launchers are executable where present
+  #         chmod -R +x ./artifacts/*/fiji-linux-x64 || true
+  #         chmod -R +x ./artifacts/*/fiji || true
+  #         chmod -R +x ./artifacts/*/config/jaunch/jaunch-linux-x64 || true
 
-      - name: 🔎 List downloaded artifacts
-        run: |
-          echo "Artifacts dir:"
-          ls -lh ./artifacts || true
+  #     - name: 📦 Create zip files and set release tag 🔖
+  #       id: prepare_release
+  #       run: |
+  #         # Use a timestamp (date + time) so multiple releases on the same
+  #         # day get unique tags and artifact names.
+  #         CURRENT_DATE=$(date +%Y-%m-%d)
+  #         CURRENT_TIME=$(date +%H-%M)
+  #         TIMESTAMP="${CURRENT_DATE}-${CURRENT_TIME}"
+  #         echo "RELEASE_TAG=v${TIMESTAMP}" >> $GITHUB_OUTPUT
+  #         echo "RELEASE_NAME=Fiji-IMCF ${CURRENT_DATE} ${CURRENT_TIME}" >> $GITHUB_OUTPUT
+  #         cd artifacts
+  #         for d in Fiji.app-*; do
+  #           if [ -d "$d" ]; then
+  #             zip -1 -r "${d}-${TIMESTAMP}.zip" "$d"
+  #           fi
+  #         done
+  #         cd ..
 
-      - name: 🚀 Create Release and Upload Artifacts
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.prepare_release.outputs.RELEASE_TAG }}
-          name: ${{ steps.prepare_release.outputs.RELEASE_NAME }}
-          generate_release_notes: true
-          draft: false
-          prerelease: true
-          files: |
-            ./artifacts/*.zip
+  #     - name: 🔎 List downloaded artifacts
+  #       run: |
+  #         echo "Artifacts dir:"
+  #         ls -lh ./artifacts || true
+
+  #     - name: 🚀 Create Release and Upload Artifacts
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         tag_name: ${{ env.RELEASE_TAG }}
+  #         name: ${{ env.RELEASE_NAME }}
+  #         generate_release_notes: true
+  #         draft: false
+  #         prerelease: true
+  #         files: |
+  #           ./artifacts/*.zip
