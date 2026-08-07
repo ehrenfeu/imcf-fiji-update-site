@@ -166,7 +166,7 @@ jobs:
 
       - run: |
           echo PWD $(pwd)
-          ls artifacts
+          find artifacts
 
   #     - name: 📥 Download Fiji artifacts (fiji-stable linux)
   #       uses: actions/download-artifact@v8
