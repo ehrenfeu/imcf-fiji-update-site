@@ -11,89 +11,111 @@ on:
         default: "Manual trigger"
 
 jobs:
-  assemble-fiji:
-    name: 🏗️ Assemble Fiji Packages 📦
-    strategy:
-      matrix:
-        # os: [ ubuntu-latest, windows-latest ]
-        # channel: [ fiji-latest, fiji-stable ]
-        os: [ ubuntu-latest ]
-        channel: [ fiji-latest ]
-    runs-on: ${{ matrix.os }}
 
+  set-common-variables:
+    name: 👷🏼 Prepare workflow run
+    runs-on: ubuntu-latest
     steps:
 
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v7
-
-      - name: 🧮 Set variables
-        id: set_platform
+      - name: 🧮 Set variables common for all jobs
         shell: bash
         run: |
-          if [[ "${{ matrix.os }}" == windows-* ]]; then
-            echo "PLATFORM=win64" >> $GITHUB_ENV
-            echo "FIJI_DIR=Fiji.app-win64" >> $GITHUB_ENV
-            echo "PLATFORM_NAME=windows" >> $GITHUB_ENV
-          else
-            echo "PLATFORM=linux64" >> $GITHUB_ENV
-            echo "FIJI_DIR=Fiji.app-linux" >> $GITHUB_ENV
-            echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
-          fi
+          CURRENT_DATE=$(date +%Y-%m-%d)
+          CURRENT_TIME=$(date +%H-%M)
+          TIMESTAMP="${CURRENT_DATE}-${CURRENT_TIME}"
+          echo "
+          CURRENT_DATE=$CURRENT_DATE
+          CURRENT_TIME=$CURRENT_TIME
+          TIMESTAMP=$TIMESTAMP
+          RELEASE_TAG=v${TIMESTAMP}
+          RELEASE_NAME=${CURRENT_DATE} ${CURRENT_TIME}
+          " >> $GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
+          cat $GITHUB_OUTPUT
 
-      - name: 🐛 Debug variables
-        shell: bash
-        run: |
-          echo "PLATFORM=$PLATFORM (${{ env.PLATFORM }})"
-          echo "FIJI_DIR=$FIJI_DIR (${{ env.FIJI_DIR }})"
-          echo "PLATFORM_NAME=$PLATFORM_NAME (${{ env.PLATFORM_NAME }})"
+  # assemble-fiji:
+  #   name: 🏗️ Assemble Fiji Packages 📦
+  #   strategy:
+  #     matrix:
+  #       # os: [ ubuntu-latest, windows-latest ]
+  #       # channel: [ fiji-latest, fiji-stable ]
+  #       os: [ ubuntu-latest ]
+  #       channel: [ fiji-latest ]
+  #   runs-on: ${{ matrix.os }}
 
-      - name: 💾 Cache Fiji base package
-        id: cache-fiji
-        uses: actions/cache@v6
-        with:
-          path: fiji-*.zip
-          key:
-            fiji-base-${{ matrix.channel }}-${{ env.PLATFORM }}-${{ hashFiles('manage/assemble-fresh-fiji-installation.sh') }}
+  #   steps:
 
-      - name: 🗃 Cache 📦 APT Packages
-        uses: awalsh128/cache-apt-pkgs-action@v1.6.3
-        with:
-          packages:
-            xvfb
-            libx11-6
-            libxext6
-            libxrender1
-            libxtst6
-            libxi6
-          version: 1.0
+  #     - name: 📥 Checkout repository
+  #       uses: actions/checkout@v7
 
-      - name: 🏃‍♂️ Run the assembly script
-        shell: bash
-        run: |
-          bash manage/assemble-fresh-fiji-installation.sh \
-              manage/update-sites-all.json \
-              $PLATFORM \
-              ${{ matrix.channel }}
+  #     - name: 🧮 Set job-specific variables
+  #       id: set_platform
+  #       shell: bash
+  #       run: |
+  #         if [[ "${{ matrix.os }}" == windows-* ]]; then
+  #           echo "PLATFORM=win64" >> $GITHUB_ENV
+  #           echo "FIJI_DIR=Fiji.app-win64" >> $GITHUB_ENV
+  #           echo "PLATFORM_NAME=windows" >> $GITHUB_ENV
+  #         else
+  #           echo "PLATFORM=linux64" >> $GITHUB_ENV
+  #           echo "FIJI_DIR=Fiji.app-linux" >> $GITHUB_ENV
+  #           echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
+  #         fi
 
-      - name: 🔧 Ensure downloaded Fiji launchers are executable
-        run: |
-          echo "Setting executable bits for Fiji artifacts"
-          cd ${{ env.FIJI_DIR }}
-          pwd
-          chmod -Rv +x Fiji.app-* || true
-          # Ensure jaunch helper and primary launchers are executable where present
-          chmod -Rv +x fiji-linux-x64 || true
-          chmod -Rv +x fiji || true
-          chmod -Rv +x config/jaunch/jaunch-linux-x64 || true
-          ls -la config/jaunch
+  #     - name: 🐛 Debug variables
+  #       shell: bash
+  #       run: |
+  #         echo "PLATFORM=$PLATFORM (${{ env.PLATFORM }})"
+  #         echo "FIJI_DIR=$FIJI_DIR (${{ env.FIJI_DIR }})"
+  #         echo "PLATFORM_NAME=$PLATFORM_NAME (${{ env.PLATFORM_NAME }})"
 
-      - name: 📤 Upload packaged 📦 Fiji artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: Fiji.app-${{ env.PLATFORM }}.zip
-          path: ${{ env.FIJI_DIR }}
-          compression-level: 1
-          retention-days: 2
+  #     - name: 💾 Cache Fiji base package
+  #       id: cache-fiji
+  #       uses: actions/cache@v6
+  #       with:
+  #         path: fiji-*.zip
+  #         key:
+  #           fiji-base-${{ matrix.channel }}-${{ env.PLATFORM }}-${{ hashFiles('manage/assemble-fresh-fiji-installation.sh') }}
+
+  #     - name: 🗃 Cache 📦 APT Packages
+  #       uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+  #       with:
+  #         packages:
+  #           xvfb
+  #           libx11-6
+  #           libxext6
+  #           libxrender1
+  #           libxtst6
+  #           libxi6
+  #         version: 1.0
+
+  #     - name: 🏃‍♂️ Run the assembly script
+  #       shell: bash
+  #       run: |
+  #         bash manage/assemble-fresh-fiji-installation.sh \
+  #             manage/update-sites-all.json \
+  #             $PLATFORM \
+  #             ${{ matrix.channel }}
+
+  #     - name: 🔧 Ensure downloaded Fiji launchers are executable
+  #       run: |
+  #         echo "Setting executable bits for Fiji artifacts"
+  #         cd ${{ env.FIJI_DIR }}
+  #         pwd
+  #         chmod -Rv +x Fiji.app-* || true
+  #         # Ensure jaunch helper and primary launchers are executable where present
+  #         chmod -Rv +x fiji-linux-x64 || true
+  #         chmod -Rv +x fiji || true
+  #         chmod -Rv +x config/jaunch/jaunch-linux-x64 || true
+  #         ls -la config/jaunch
+
+  #     - name: 📤 Upload packaged 📦 Fiji artifact
+  #       uses: actions/upload-artifact@v7
+  #       with:
+  #         name: Fiji.app-${{ env.PLATFORM }}.zip
+  #         path: ${{ env.FIJI_DIR }}
+  #         compression-level: 1
+  #         retention-days: 2
 
 
   # release:
