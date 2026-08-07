@@ -22,7 +22,7 @@ jobs:
       # - name: 📥 Checkout repository
       #   uses: actions/checkout@v7
 
-      - name: 🖥️ Set platform variable
+      - name: 🖥️ Set platform variables
         id: set_platform
         shell: bash
         run: |
@@ -36,11 +36,12 @@ jobs:
             echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
           fi
 
-      - name: 🐛 Debug platform variable
+      - name: 🐛 Debug variables
         shell: bash
         run: |
-          echo "PLATFORM=$PLATFORM"
-          echo "FIJI_DIR=$FIJI_DIR"
+          echo "PLATFORM=$PLATFORM (${{ env.PLATFORM }})"
+          echo "FIJI_DIR=$FIJI_DIR (${{ env.FIJI_DIR }})"
+          echo "PLATFORM_NAME=$PLATFORM_NAME (${{ env.PLATFORM_NAME }})"
 
   #     - name: 💾 Cache Fiji base package
   #       id: cache-fiji
