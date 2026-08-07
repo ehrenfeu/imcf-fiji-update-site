@@ -16,15 +16,15 @@ jobs:
     name: 👷🏼 Prepare workflow run
     runs-on: ubuntu-latest
     outputs:
-      CURRENT_DATE: ${{ steps.common_vars.outputs.CURRENT_DATE }}
-      CURRENT_TIME: ${{ steps.common_vars.outputs.CURRENT_TIME }}
-      TIMESTAMP: ${{ steps.common_vars.outputs.TIMESTAMP }}
-      RELEASE_TAG: ${{ steps.common_vars.outputs.RELEASE_TAG }}
-      RELEASE_NAME: ${{ steps.common_vars.outputs.RELEASE_NAME }}
+      CURRENT_DATE: ${{ steps.common-vars.outputs.CURRENT_DATE }}
+      CURRENT_TIME: ${{ steps.common-vars.outputs.CURRENT_TIME }}
+      TIMESTAMP: ${{ steps.common-vars.outputs.TIMESTAMP }}
+      RELEASE_TAG: ${{ steps.common-vars.outputs.RELEASE_TAG }}
+      RELEASE_NAME: ${{ steps.common-vars.outputs.RELEASE_NAME }}
     steps:
 
       - name: 🧮 Set variables common for all jobs
-        id: common_vars
+        id: common-vars
         shell: bash
         run: |
           CURRENT_DATE=$(date +%Y-%m-%d)
