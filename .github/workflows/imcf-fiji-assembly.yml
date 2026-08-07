@@ -86,6 +86,7 @@ jobs:
             fiji-base-${{ matrix.channel }}-${{ env.PLATFORM }}-${{ hashFiles('manage/assemble-fresh-fiji-installation.sh') }}
 
       - name: 🗃 Cache 📦 APT Packages
+        if: matrix.os == 'ubuntu-latest'
         uses: awalsh128/cache-apt-pkgs-action@v1.6.3
         with:
           packages:
