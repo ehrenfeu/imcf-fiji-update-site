@@ -35,6 +35,10 @@ jobs:
             echo "FIJI_DIR=Fiji.app-linux" >> $GITHUB_ENV
             echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
           fi
+
+      - name: 🐛 Debug platform variable
+        shell: bash
+        run: |
           echo "PLATFORM=$PLATFORM"
           echo "FIJI_DIR=$FIJI_DIR"
 
