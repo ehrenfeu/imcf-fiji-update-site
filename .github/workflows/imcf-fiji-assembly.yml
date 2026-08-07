@@ -160,13 +160,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 📥 Download Fiji artifacts (both channels)
+      - name: 📥 Download Fiji artifacts
         uses: actions/download-artifact@v8
         with:
-          name: Fiji.app-linux64-${{ env.TIMESTAMP }}-fiji-latest
-          path: artifacts/Fiji.app-linux64-${{ env.TIMESTAMP }}-fiji-latest
+          path: artifacts/
 
       - run: |
+          echo PWD $(pwd)
           ls artifacts
 
   #     - name: 📥 Download Fiji artifacts (fiji-stable linux)
