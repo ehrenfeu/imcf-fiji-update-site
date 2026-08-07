@@ -152,7 +152,7 @@ jobs:
 
   release:
     name: 🚚🌐 Publish Fiji Packages 📦
-    needs: assemble-fiji
+    needs: [ common-vars, assemble-fiji ]
     runs-on: ubuntu-latest
     steps:
 
@@ -163,69 +163,27 @@ jobs:
           " >> $GITHUB_ENV
           cat $GITHUB_ENV
 
-      # - name: 📥 Checkout repository
-      #   uses: actions/checkout@v7
-      #   with:
-      #     fetch-depth: 0
-
       - name: 📥 Download Fiji artifacts
         uses: actions/download-artifact@v8
         with:
           skip-decompress: true
           merge-multiple: false
 
-      - run: |
+      - name: 📦🔖 Collect files and set release tag
+        run: |
+          echo "RELEASE_TAG=v${{ needs.common-vars.outputs.TIMESTAMP }}" >> $GITHUB_ENV
           echo PWD $(pwd)
+          mkdir collect
           find
+          mv -v Fiji.app-*/*.zip collect/
 
-  #     - name: 📥 Download Fiji artifacts (fiji-stable linux)
-  #       uses: actions/download-artifact@v8
-  #       with:
-  #         name: Fiji.app-fiji-stable-linux
-  #         path: ./artifacts/Fiji.app-fiji-stable-linux
-
-  #     - name: 📥 Download Fiji artifacts (fiji-latest windows)
-  #       uses: actions/download-artifact@v8
-  #       with:
-  #         name: Fiji.app-fiji-latest-windows
-  #         path: ./artifacts/Fiji.app-fiji-latest-windows
-
-  #     - name: 📥 Download Fiji artifacts (fiji-stable windows)
-  #       uses: actions/download-artifact@v8
-  #       with:
-  #         name: Fiji.app-fiji-stable-windows
-  #         path: ./artifacts/Fiji.app-fiji-stable-windows
-
-  #     - name: 📦 Create zip files and set release tag 🔖
-  #       id: prepare_release
-  #       run: |
-  #         # Use a timestamp (date + time) so multiple releases on the same
-  #         # day get unique tags and artifact names.
-  #         TIMESTAMP=$(date +%Y-%m-%d)
-  #         CURRENT_TIME=$(date +%H-%M)
-  #         TIMESTAMP="${TIMESTAMP}-${CURRENT_TIME}"
-  #         echo "RELEASE_TAG=v${TIMESTAMP}" >> $GITHUB_OUTPUT
-  #         echo "RELEASE_NAME=Fiji-IMCF ${TIMESTAMP} ${CURRENT_TIME}" >> $GITHUB_OUTPUT
-  #         cd artifacts
-  #         for d in Fiji.app-*; do
-  #           if [ -d "$d" ]; then
-  #             zip -1 -r "${d}-${TIMESTAMP}.zip" "$d"
-  #           fi
-  #         done
-  #         cd ..
-
-  #     - name: 🔎 List downloaded artifacts
-  #       run: |
-  #         echo "Artifacts dir:"
-  #         ls -lh ./artifacts || true
-
-  #     - name: 🚀 Create Release and Upload Artifacts
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         tag_name: ${{ env.RELEASE_TAG }}
-  #         name: ${{ env.RELEASE_NAME }}
-  #         generate_release_notes: true
-  #         draft: false
-  #         prerelease: true
-  #         files: |
-  #           ./artifacts/*.zip
+      - name: 🚀 Create Release and Upload Artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: ${{ env.TIMESTAMP }}
+          generate_release_notes: false
+          draft: false
+          prerelease: true
+          files: |
+            ./collect/*.zip
