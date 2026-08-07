@@ -22,13 +22,13 @@ jobs:
         run: |
           CURRENT_DATE=$(date +%Y-%m-%d)
           CURRENT_TIME=$(date +%H-%M)
-          TIMESTAMP="${CURRENT_DATE}-${CURRENT_TIME}"
+          TIMESTAMP="${CURRENT_DATE}--${CURRENT_TIME}"
           echo "
           CURRENT_DATE=$CURRENT_DATE
           CURRENT_TIME=$CURRENT_TIME
           TIMESTAMP=$TIMESTAMP
           RELEASE_TAG=v${TIMESTAMP}
-          RELEASE_NAME=${CURRENT_DATE} ${CURRENT_TIME}
+          RELEASE_NAME="${CURRENT_DATE} (${CURRENT_TIME})"
           " >> $GITHUB_OUTPUT
           echo $GITHUB_OUTPUT
           cat $GITHUB_OUTPUT
