@@ -90,7 +90,7 @@ jobs:
       - name: 📤 Upload packaged 📦 Fiji artifact
         uses: actions/upload-artifact@v7
         with:
-          name: Fiji.app--${{ env.PLATFORM }}
+          name: Fiji.app-${{ env.PLATFORM }}.zip
           path: ${{ env.FIJI_DIR }}
           compression-level: 1
           retention-days: 2
