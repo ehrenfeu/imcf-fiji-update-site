@@ -9,15 +9,15 @@ on:
         description: "Reason for manual run"
         required: false
         default: "Manual trigger"
-      loglevel:
-        description: 'Log level'
+      channel:
+        description: 'Fiji Channel'
         required: true
-        default: 'warning'
+        default: [ fiji-latest, fiji-stable ]
         type: choice
         options:
-          - info
-          - warning
-          - debug
+          - [ fiji-latest, fiji-stable ]
+          - [ fiji-latest ]
+          - [ fiji-stable ]
 
 jobs:
 
@@ -46,7 +46,8 @@ jobs:
     strategy:
       matrix:
         # os: [ ubuntu-latest, windows-latest ]
-        channel: [ fiji-latest, fiji-stable ]
+        # channel: [ fiji-latest, fiji-stable ]
+        channel: ${{ inputs.channel }}
         os: [ ubuntu-latest ]
         # channel: [ fiji-latest ]
     runs-on: ${{ matrix.os }}
