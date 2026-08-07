@@ -109,11 +109,12 @@ jobs:
         run: |
           echo PWD $(pwd)
           echo HOME $HOME
-          FIJI_DIR_FULL="$(pwd)/${{ env.FIJI_DIR }}"
+
           echo "Renaming Fiji.app-${{ env.PLATFORM }} to ${{ env.FIJI_DIR }}"
-          ls
+          # ls
           mv -v "Fiji.app-${{ env.PLATFORM }}" "${{ env.FIJI_DIR }}"
-          ls
+          # ls
+
           echo "Setting executable bits for Fiji artifacts"
           cd ${{ env.FIJI_DIR }}
           echo PWD $(pwd)
