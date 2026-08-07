@@ -16,27 +16,16 @@ jobs:
     name: 👷🏼 Prepare workflow run
     runs-on: ubuntu-latest
     outputs:
-      CURRENT_DATE: ${{ steps.set-vars.outputs.CURRENT_DATE }}
-      CURRENT_TIME: ${{ steps.set-vars.outputs.CURRENT_TIME }}
       TIMESTAMP: ${{ steps.set-vars.outputs.TIMESTAMP }}
-      RELEASE_TAG: ${{ steps.set-vars.outputs.RELEASE_TAG }}
-      RELEASE_NAME: ${{ steps.set-vars.outputs.RELEASE_NAME }}
     steps:
 
       - name: 🧮 Set variables common for all jobs
         id: set-vars
         shell: bash
         run: |
-          CURRENT_DATE=$(date +%Y-%m-%d)
-          CURRENT_TIME=$(date +%H-%M)
-          CURRENT_TIME_H="$(echo $CURRENT_TIME | sed 's/-/:/')"
-          TIMESTAMP="${CURRENT_DATE}--${CURRENT_TIME}"
+          TIMESTAMP=$(date +%Y-%m-%d)
           echo "
-          CURRENT_DATE=$CURRENT_DATE
-          CURRENT_TIME=$CURRENT_TIME
           TIMESTAMP=$TIMESTAMP
-          RELEASE_TAG=v${TIMESTAMP}
-          RELEASE_NAME=${CURRENT_DATE} ${CURRENT_TIME_H}
           " >> $GITHUB_OUTPUT
 
           cat $GITHUB_OUTPUT
@@ -58,11 +47,7 @@ jobs:
       - name: 🧮🌍 Make common variables available for job
         run: |
           echo "
-          CURRENT_DATE=${{ needs.common-vars.outputs.CURRENT_DATE }}
-          CURRENT_TIME=${{ needs.common-vars.outputs.CURRENT_TIME }}
           TIMESTAMP=${{ needs.common-vars.outputs.TIMESTAMP }}
-          RELEASE_TAG=${{ needs.common-vars.outputs.RELEASE_TAG }}
-          RELEASE_NAME=${{ needs.common-vars.outputs.RELEASE_NAME }}
           " >> $GITHUB_ENV
           cat $GITHUB_ENV
 
@@ -87,64 +72,71 @@ jobs:
           $PLATFORM (${{ env.PLATFORM }})
           $FIJI_DIR (${{ env.FIJI_DIR }})
           $PLATFORM_NAME (${{ env.PLATFORM_NAME }})
-          $CURRENT_DATE (${{ env.CURRENT_DATE }})
-          $CURRENT_TIME (${{ env.CURRENT_TIME }})
           $TIMESTAMP (${{ env.TIMESTAMP }})
-          $RELEASE_TAG (${{ env.RELEASE_TAG }})
-          $RELEASE_NAME (${{ env.RELEASE_NAME }})
           "
 
-  #     - name: 💾 Cache Fiji base package
-  #       id: cache-fiji
-  #       uses: actions/cache@v6
-  #       with:
-  #         path: fiji-*.zip
-  #         key:
-  #           fiji-base-${{ matrix.channel }}-${{ env.PLATFORM }}-${{ hashFiles('manage/assemble-fresh-fiji-installation.sh') }}
+      # - name: 💾 Cache Fiji base package
+      #   id: cache-fiji
+      #   uses: actions/cache@v6
+      #   with:
+      #     path: fiji-*.zip
+      #     key:
+      #       fiji-base-${{ matrix.channel }}-${{ env.PLATFORM }}-${{ hashFiles('manage/assemble-fresh-fiji-installation.sh') }}
 
-  #     - name: 🗃 Cache 📦 APT Packages
-  #       uses: awalsh128/cache-apt-pkgs-action@v1.6.3
-  #       with:
-  #         packages:
-  #           xvfb
-  #           libx11-6
-  #           libxext6
-  #           libxrender1
-  #           libxtst6
-  #           libxi6
-  #         version: 1.0
+      # - name: 🗃 Cache 📦 APT Packages
+      #   uses: awalsh128/cache-apt-pkgs-action@v1.6.3
+      #   with:
+      #     packages:
+      #       xvfb
+      #       libx11-6
+      #       libxext6
+      #       libxrender1
+      #       libxtst6
+      #       libxi6
+      #     version: 1.0
 
-  #     - name: 📥 Checkout repository
-  #       uses: actions/checkout@v7
+      # - name: 📥 Checkout repository
+      #   uses: actions/checkout@v7
 
+      # - name: 🏃‍♂️ Run the assembly script
+      #   shell: bash
+      #   run: |
+      #     bash manage/assemble-fresh-fiji-installation.sh \
+      #         manage/update-sites-all.json \
+      #         $PLATFORM \
+      #         ${{ matrix.channel }}
 
-  #     - name: 🏃‍♂️ Run the assembly script
-  #       shell: bash
-  #       run: |
-  #         bash manage/assemble-fresh-fiji-installation.sh \
-  #             manage/update-sites-all.json \
-  #             $PLATFORM \
-  #             ${{ matrix.channel }}
+      # - name: 🔧 Ensure downloaded Fiji launchers are executable
+      #   run: |
+      #     echo "Setting executable bits for Fiji artifacts"
+      #     cd ${{ env.FIJI_DIR }}
+      #     pwd
+      #     chmod -Rv +x Fiji.app-* || true
+      #     # Ensure jaunch helper and primary launchers are executable where present
+      #     chmod -Rv +x fiji-linux-x64 || true
+      #     chmod -Rv +x fiji || true
+      #     chmod -Rv +x config/jaunch/jaunch-linux-x64 || true
+      #     ls -la config/jaunch
 
-  #     - name: 🔧 Ensure downloaded Fiji launchers are executable
-  #       run: |
-  #         echo "Setting executable bits for Fiji artifacts"
-  #         cd ${{ env.FIJI_DIR }}
-  #         pwd
-  #         chmod -Rv +x Fiji.app-* || true
-  #         # Ensure jaunch helper and primary launchers are executable where present
-  #         chmod -Rv +x fiji-linux-x64 || true
-  #         chmod -Rv +x fiji || true
-  #         chmod -Rv +x config/jaunch/jaunch-linux-x64 || true
-  #         ls -la config/jaunch
+      # - name: 🧮📍 Set artifact label
+      #   run: |
+      #     echo "LABEL=${{ env.PLATFORM }}--${{ matrix.channel }}"
+      #       echo "PLATFORM=win64" >> $GITHUB_ENV
+      #       echo "FIJI_DIR=Fiji.app-win64" >> $GITHUB_ENV
+      #       echo "PLATFORM_NAME=windows" >> $GITHUB_ENV
+      #     else
+      #       echo "PLATFORM=linux64" >> $GITHUB_ENV
+      #       echo "FIJI_DIR=Fiji.app-linux" >> $GITHUB_ENV
+      #       echo "PLATFORM_NAME=linux" >> $GITHUB_ENV
+      #     fi
 
-  #     - name: 📤 Upload packaged 📦 Fiji artifact
-  #       uses: actions/upload-artifact@v7
-  #       with:
-  #         name: Fiji.app-${{ env.PLATFORM }}.zip
-  #         path: ${{ env.FIJI_DIR }}
-  #         compression-level: 1
-  #         retention-days: 2
+      # - name: 📤 Upload packaged 📦 Fiji artifact
+      #   uses: actions/upload-artifact@v7
+      #   with:
+      #     name: Fiji.app-${{ env.PLATFORM }}--${{ matrix.channel }}.zip
+      #     path: ${{ env.FIJI_DIR }}
+      #     compression-level: 1
+      #     retention-days: 2
 
 
   # release:
@@ -186,11 +178,11 @@ jobs:
   #       run: |
   #         # Use a timestamp (date + time) so multiple releases on the same
   #         # day get unique tags and artifact names.
-  #         CURRENT_DATE=$(date +%Y-%m-%d)
+  #         TIMESTAMP=$(date +%Y-%m-%d)
   #         CURRENT_TIME=$(date +%H-%M)
-  #         TIMESTAMP="${CURRENT_DATE}-${CURRENT_TIME}"
+  #         TIMESTAMP="${TIMESTAMP}-${CURRENT_TIME}"
   #         echo "RELEASE_TAG=v${TIMESTAMP}" >> $GITHUB_OUTPUT
-  #         echo "RELEASE_NAME=Fiji-IMCF ${CURRENT_DATE} ${CURRENT_TIME}" >> $GITHUB_OUTPUT
+  #         echo "RELEASE_NAME=Fiji-IMCF ${TIMESTAMP} ${CURRENT_TIME}" >> $GITHUB_OUTPUT
   #         cd artifacts
   #         for d in Fiji.app-*; do
   #           if [ -d "$d" ]; then
